@@ -62,4 +62,8 @@ app.post('/login', (req, res) => {
   })
   
 })
+
+app.get('/api/users/auth', auth , (req, res) => {
+
+})
 app.listen(port, () => console.log('Example app!'));
