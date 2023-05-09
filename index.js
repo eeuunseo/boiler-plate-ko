@@ -5,6 +5,7 @@ const config = require("./config/key");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const {User} = require("./models/User");
+const {auth} = require("./middleware/auth");
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -64,6 +65,26 @@ app.post('/login', (req, res) => {
 })
 
 app.get('/api/users/auth', auth , (req, res) => {
-
+  // 여기 까지 미들웨어를 통과해 왔다는 얘기는 Authentication이 True라는 뜻
+  res.status(200).json({
+    _id: req.user._id,
+    isAdmin: req.user.role === 0 ? false : true,
+    isAuth: true,
+    email: req.user.email,
+    name: req.user.name, 
+    lastname: req.user.lastname,
+    role: req.user.role,
+    image: req.user.image
+  })
 })
+
+app.get('/api/users/logout', auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, {token: ""}, (err, user) => {
+    if (err) return res.json ({success: false, err});
+    return res.status(200).send({
+      success: true
+    })
+  })
+})
+
 app.listen(port, () => console.log('Example app!'));
